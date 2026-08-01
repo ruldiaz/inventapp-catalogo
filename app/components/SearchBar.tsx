@@ -201,7 +201,7 @@ export default function SearchBar({ onSearch, initialValue = '' }: SearchBarProp
                                     </div>
                                 </div>
                                 {suggestion.image && (
-                                    <div className="relative w-10 h-10 flex-shrink-0">
+                                    <div className="relative w-10 h-10 shrink-0">
                                         <Image
                                             src={suggestion.image}
                                             alt={suggestion.name}

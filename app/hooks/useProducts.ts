@@ -29,7 +29,7 @@ export function useProducts(initialPage = 1, limit = 20) {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(initialPage);
     const [searchTerm, setSearchTerm] = useState('');
-    const isFirstRender = useRef(true);
+    const isMounted = useRef(false);
 
     const fetchProducts = useCallback(async (page: number, search: string) => {
         setLoading(true);
@@ -51,30 +51,24 @@ export function useProducts(initialPage = 1, limit = 20) {
         }
     }, [limit]);
 
-    // Efecto para carga inicial
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
+        if (!isMounted.current) {
+            isMounted.current = true;
             fetchProducts(currentPage, searchTerm);
         }
-    }, []); // Solo se ejecuta una vez
-
-    // Efecto para cambios de página o búsqueda
-    useEffect(() => {
-        if (!isFirstRender.current) {
-            fetchProducts(currentPage, searchTerm);
-        }
-    }, [currentPage, searchTerm, fetchProducts]);
+    }, [fetchProducts, currentPage, searchTerm]);
 
     const handlePageChange = (page: number) => {
         if (page >= 1 && page <= (pagination?.totalPages || 1)) {
             setCurrentPage(page);
+            fetchProducts(page, searchTerm);
         }
     };
 
     const handleSearch = (term: string) => {
         setSearchTerm(term);
         setCurrentPage(1);
+        fetchProducts(1, term);
     };
 
     return {
