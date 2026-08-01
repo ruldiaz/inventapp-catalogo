@@ -1,9 +1,12 @@
 import { sql } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
+// Forzar que esta API sea dinámica (no estática)
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(request: NextRequest) {
     try {
-        // Obtener parámetros de la URL
         const searchParams = request.nextUrl.searchParams;
         const page = parseInt(searchParams.get('page') || '1');
         const limit = parseInt(searchParams.get('limit') || '20');
@@ -13,11 +16,9 @@ export async function GET(request: NextRequest) {
         let products;
         let totalResult;
 
-        // Si hay búsqueda, usar filtro
         if (search.trim()) {
             const searchTerm = `%${search.trim()}%`;
             
-            // Obtener productos con búsqueda
             products = await sql`
                 SELECT
                     id,
@@ -37,7 +38,6 @@ export async function GET(request: NextRequest) {
                 OFFSET ${offset}
             `;
 
-            // Total con búsqueda
             totalResult = await sql`
                 SELECT COUNT(*) as total
                 FROM public."Product"
@@ -45,7 +45,6 @@ export async function GET(request: NextRequest) {
                     AND (name ILIKE ${searchTerm} OR sku ILIKE ${searchTerm})
             `;
         } else {
-            // Sin búsqueda, traer todos
             products = await sql`
                 SELECT
                     id,
